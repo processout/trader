@@ -28,13 +28,6 @@ type Currencies []*Currency
 
 // Equals compares both currencies to see if they're Equals
 func (c Currencies) Equals(c2 Currencies) bool {
-	if c == c2 {
-		return true
-	}
-	if c == nil || c2 == nil {
-		return false
-	}
-
 	for _, v := range c {
 		found := false
 		for _, v2 := range c2 {
