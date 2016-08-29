@@ -506,3 +506,35 @@ func TestInt64(t *testing.T) {
 		t.Error("Wrong conversion")
 	}
 }
+
+func TestUint64(t *testing.T) {
+	trader := getTrader()
+	amount, _ := trader.NewAmountFromString("2.3", "usd")
+
+	r, err := amount.Int64()
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r != 230 {
+		t.Error("Wrong conversion")
+	}
+
+	amount.Currency.Code = "BHD"
+	r, err = amount.Int64()
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r != 2300 {
+		t.Error("Wrong conversion")
+	}
+
+	amount.Currency.Code = "USD"
+	amount, _ = trader.NewAmountFromString("2.34", "usd")
+	r, err = amount.Int64()
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r != 234 {
+		t.Error("Wrong conversion")
+	}
+}
