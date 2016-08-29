@@ -15,6 +15,19 @@ type Currency struct {
 	Value *decimal.Decimal `json:"value"`
 }
 
+// Equals compares two Currency(s)
+func (c *Currency) Equals(c2 *Currency) bool {
+	if c == c2 {
+		return true
+	}
+	if c == nil || c2 == nil {
+		return false
+	}
+
+	return c.Code == c2.Code &&
+		c.Value.Cmp(*c2.Value) == 0
+}
+
 // NewCurrency creates a new Currency structure
 func NewCurrency(code string, v *decimal.Decimal) *Currency {
 	return &Currency{
@@ -32,6 +45,12 @@ func (c Currencies) Equals(c2 Currencies) bool {
 		found := false
 		for _, v2 := range c2 {
 			if v == v2 {
+				found = true
+				break
+			} else if v == nil || v2 == nil {
+				found = false
+				break
+			} else if v.Equals(v2) {
 				found = true
 				break
 			}
