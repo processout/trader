@@ -156,6 +156,22 @@ func (a Amount) Div(b *Amount) (*Amount, error) {
 	return n.ToCurrency(a.Currency.Code)
 }
 
+// Cmp compares a and b precisely in this order.
+// Returns:
+//	- = 0 if a is equal to b
+//  - < 0 if a is smaller than b
+//  - > 0 if a is greater than b
+// The comparison is done using both amount's base currencies
+func (a *Amount) Cmp(b *Amount) (int, error) {
+	if a.Trader.BaseCurrency.Code != b.Trader.BaseCurrency.Code {
+		return 0, fmt.Errorf("The base currency of a and b differ: %s & %s",
+			a.Trader.BaseCurrency.Code, b.Trader.BaseCurrency.Code)
+	}
+
+	c := a.BaseCurrencyValue().Cmp(*b.BaseCurrencyValue())
+	return c, nil
+}
+
 // String returns the amount value with the given number of decimals
 func (a Amount) String(decimals int32) string {
 	return a.Value.StringFixed(decimals)
