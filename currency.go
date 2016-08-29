@@ -26,6 +26,31 @@ func NewCurrency(code string, v *decimal.Decimal) *Currency {
 // Currencies represents a slice of Currencies
 type Currencies []*Currency
 
+// Equals compares both currencies to see if they're Equals
+func (c *Currencies) Equals(c2 *Currencies) bool {
+	if c == c2 {
+		return true
+	}
+	if c == nil || c2 == nil {
+		return false
+	}
+
+	for _, v := range *c {
+		found := false
+		for _, v2 := range *c2 {
+			if v == v2 {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+
+	return true
+}
+
 // Find finds a Currency within the Currencies slice from the given
 // currency code, or returns an error if the currency code was not found
 func (c Currencies) Find(code string) (*Currency, error) {
