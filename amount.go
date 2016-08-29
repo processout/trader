@@ -181,6 +181,9 @@ func (a *Amount) Round(places int32) {
 	a.Value = &rounded
 }
 
+// Int64 translates an amount into an integer (of type int64),
+// basically adjusts the amount to the lowest possible decimal of
+// the currency (USD: 10.23 -> 1023)
 func (a *Amount) Int64() (int64, error) {
 	mulF := math.Pow10(a.Currency.DecimalPlaces())
 
@@ -202,7 +205,6 @@ func (a *Amount) Int64() (int64, error) {
 	}
 
 	return i64, nil
-
 }
 
 // String returns the amount value with the given number of decimals
