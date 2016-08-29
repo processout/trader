@@ -27,7 +27,7 @@ func NewCurrency(code string, v *decimal.Decimal) *Currency {
 type Currencies []*Currency
 
 // Equals compares both currencies to see if they're Equals
-func (c *Currencies) Equals(c2 *Currencies) bool {
+func (c Currencies) Equals(c2 Currencies) bool {
 	if c == c2 {
 		return true
 	}
@@ -35,9 +35,9 @@ func (c *Currencies) Equals(c2 *Currencies) bool {
 		return false
 	}
 
-	for _, v := range *c {
+	for _, v := range c {
 		found := false
-		for _, v2 := range *c2 {
+		for _, v2 := range c2 {
 			if v == v2 {
 				found = true
 				break
