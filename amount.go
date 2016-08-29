@@ -207,6 +207,30 @@ func (a *Amount) Int64() (int64, error) {
 	return i64, nil
 }
 
+// Uint64 does the same thing as Int64, but for unsigned
+func (a *Amount) Uint64() (uint64, error) {
+	mulF := math.Pow10(a.Currency.DecimalPlaces())
+
+	factor, err := a.Trader.NewAmountFromFloat(mulF, a.Currency.Code)
+	if err != nil {
+		return 0, err
+	}
+
+	newAmount, err := a.Mul(factor)
+	if err != nil {
+		return 0, err
+	}
+
+	newAmount.Round(0)
+
+	u64, err := strconv.ParseUint(newAmount.String(0), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return u64, nil
+}
+
 // String returns the amount value with the given number of decimals
 func (a Amount) String(decimals int32) string {
 	return a.Value.StringFixed(decimals)
