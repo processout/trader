@@ -2,6 +2,9 @@ package trader
 
 import (
 	"fmt"
+	"math"
+
+	"strconv"
 
 	"github.com/shopspring/decimal"
 )
@@ -170,6 +173,36 @@ func (a *Amount) Cmp(b *Amount) (int, error) {
 
 	c := a.BaseCurrencyValue().Cmp(*b.BaseCurrencyValue())
 	return c, nil
+}
+
+// Round rounds the value to the nearest places
+func (a *Amount) Round(places int32) {
+	rounded := a.Value.Round(places)
+	a.Value = &rounded
+}
+
+func (a *Amount) Int64() (int64, error) {
+	mulF := math.Pow10(a.Currency.DecimalPlaces())
+
+	factor, err := a.Trader.NewAmountFromFloat(mulF, a.Currency.Code)
+	if err != nil {
+		return 0, err
+	}
+
+	newAmount, err := a.Mul(factor)
+	if err != nil {
+		return 0, err
+	}
+
+	newAmount.Round(0)
+
+	i64, err := strconv.ParseInt(newAmount.String(0), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return i64, nil
+
 }
 
 // String returns the amount value with the given number of decimals

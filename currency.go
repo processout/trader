@@ -43,3 +43,26 @@ func (c Currencies) Find(code string) (*Currency, error) {
 func (c Currency) Is(code string) bool {
 	return c.Code == strings.ToUpper(code)
 }
+
+// DecimalPlaces returns the number of decimal places a currency has
+// e.g. for USD there are 2 ($12.25), for JPY there are 0 (5412)
+func (c Currency) DecimalPlaces() int {
+	// Here we just test for the currencies that don't have 2 decimal places
+
+	switch c.Code {
+
+	case "BIF", "BYR", "CLP", "DJF", "GNF", "ISK", "JPY", "KMF", "KRW",
+		"XPF", "XOF", "XAF", "VUV", "VND", "UYI", "UGX", "RWF", "PYG":
+		return 0
+
+	case "BHD", "IQD", "JOD", "KWD", "LYD", "TND", "OMR":
+		return 3
+
+	case "CLF":
+		return 4
+
+	default:
+		return 2
+
+	}
+}
