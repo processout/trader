@@ -435,3 +435,117 @@ func TestDiv(t *testing.T) {
 		t.Error("The amount currency was incorrectly set")
 	}
 }
+
+func TestCmp(t *testing.T) {
+	trader := getTrader()
+	trader2 := getTrader2()
+	amount, _ := trader.NewAmountFromString("2.3", "usd")
+	amount2, _ := trader2.NewAmountFromString("3.2", "bad")
+
+	_, err := amount.Cmp(amount2)
+	if err == nil {
+		t.Error("There should have been an error")
+	}
+
+	amount2, _ = trader.NewAmountFromString("3.2", "usd")
+	r, err := amount.Cmp(amount2)
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r >= 0 {
+		t.Error("Answer should have been negative (2.3 < 3.2)")
+	}
+
+	amount2, _ = trader.NewAmountFromString("2.14", "usd")
+	r, err = amount.Cmp(amount2)
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r <= 0 {
+		t.Error("Answer should have been positive (2.3 > 2.14)")
+	}
+
+	amount2, _ = trader.NewAmountFromString("2.3", "usd")
+	r, err = amount.Cmp(amount2)
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r != 0 {
+		t.Error("Answer should have been 0 (2.3 == 2.14)")
+	}
+}
+
+func TestInt64(t *testing.T) {
+	trader := getTrader()
+	amount, _ := trader.NewAmountFromString("2.3", "usd")
+
+	r, err := amount.Int64()
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r != 230 {
+		t.Error("Wrong conversion")
+	}
+
+	amount.Currency.Code = "BHD"
+	r, err = amount.Int64()
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r != 2300 {
+		t.Error("Wrong conversion")
+	}
+
+	amount.Currency.Code = "USD"
+	amount, _ = trader.NewAmountFromString("2.34", "usd")
+	r, err = amount.Int64()
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r != 234 {
+		t.Error("Wrong conversion")
+	}
+}
+
+func TestUint64(t *testing.T) {
+	trader := getTrader()
+	amount, _ := trader.NewAmountFromString("2.3", "usd")
+
+	r, err := amount.Int64()
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r != 230 {
+		t.Error("Wrong conversion")
+	}
+
+	amount.Currency.Code = "BHD"
+	r, err = amount.Int64()
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r != 2300 {
+		t.Error("Wrong conversion")
+	}
+
+	amount.Currency.Code = "USD"
+	amount, _ = trader.NewAmountFromString("2.34", "usd")
+	r, err = amount.Int64()
+	if err != nil {
+		t.Error("There shouldn't have been an error")
+	}
+	if r != 234 {
+		t.Error("Wrong conversion")
+	}
+}
+
+func TestRound(t *testing.T) {
+
+	trader := getTrader()
+	amount, _ := trader.NewAmountFromString("2.3", "usd")
+
+	amount.Round(0)
+	if amount.Value.Cmp(decimal.New(2, 0)) != 0 {
+		t.Error("Should be equal")
+	}
+}

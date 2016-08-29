@@ -2,6 +2,9 @@ package trader
 
 import (
 	"fmt"
+	"math"
+
+	"strconv"
 
 	"github.com/shopspring/decimal"
 )
@@ -154,6 +157,78 @@ func (a Amount) Div(b *Amount) (*Amount, error) {
 	c := a.BaseCurrencyValue().Div(*b.BaseCurrencyValue())
 	n, _ := a.Trader.NewAmount(&c, a.Trader.BaseCurrency.Code)
 	return n.ToCurrency(a.Currency.Code)
+}
+
+// Cmp compares a and b precisely in this order.
+// Returns:
+//	- = 0 if a is equal to b
+//  - < 0 if a is smaller than b
+//  - > 0 if a is greater than b
+// The comparison is done using both amount's base currencies
+func (a Amount) Cmp(b Amount) (int, error) {
+	if a.Trader.BaseCurrency.Code != b.Trader.BaseCurrency.Code {
+		return 0, fmt.Errorf("The base currency of a and b differ: %s & %s",
+			a.Trader.BaseCurrency.Code, b.Trader.BaseCurrency.Code)
+	}
+
+	c := a.BaseCurrencyValue().Cmp(*b.BaseCurrencyValue())
+	return c, nil
+}
+
+// Round rounds the value to the nearest places
+func (a *Amount) Round(places int32) {
+	rounded := a.Value.Round(places)
+	a.Value = &rounded
+}
+
+// Int64 translates an amount into an integer (of type int64),
+// basically adjusts the amount to the lowest possible decimal of
+// the currency (USD: 10.23 -> 1023)
+func (a Amount) Int64() (int64, error) {
+	mulF := math.Pow10(a.Currency.DecimalPlaces())
+
+	factor, err := a.Trader.NewAmountFromFloat(mulF, a.Currency.Code)
+	if err != nil {
+		return 0, err
+	}
+
+	newAmount, err := a.Mul(factor)
+	if err != nil {
+		return 0, err
+	}
+
+	newAmount.Round(0)
+
+	i64, err := strconv.ParseInt(newAmount.String(0), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return i64, nil
+}
+
+// Uint64 does the same thing as Int64, but for unsigned
+func (a Amount) Uint64() (uint64, error) {
+	mulF := math.Pow10(a.Currency.DecimalPlaces())
+
+	factor, err := a.Trader.NewAmountFromFloat(mulF, a.Currency.Code)
+	if err != nil {
+		return 0, err
+	}
+
+	newAmount, err := a.Mul(factor)
+	if err != nil {
+		return 0, err
+	}
+
+	newAmount.Round(0)
+
+	u64, err := strconv.ParseUint(newAmount.String(0), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return u64, nil
 }
 
 // String returns the amount value with the given number of decimals

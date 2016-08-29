@@ -15,6 +15,19 @@ type Currency struct {
 	Value *decimal.Decimal `json:"value"`
 }
 
+// Equals compares two Currency(s)
+func (c *Currency) Equals(c2 *Currency) bool {
+	if c == c2 {
+		return true
+	}
+	if c == nil || c2 == nil {
+		return false
+	}
+
+	return c.Code == c2.Code &&
+		c.Value.Cmp(*c2.Value) == 0
+}
+
 // NewCurrency creates a new Currency structure
 func NewCurrency(code string, v *decimal.Decimal) *Currency {
 	return &Currency{
@@ -25,6 +38,30 @@ func NewCurrency(code string, v *decimal.Decimal) *Currency {
 
 // Currencies represents a slice of Currencies
 type Currencies []*Currency
+
+// Equals compares both currencies to see if they're Equals
+func (c Currencies) Equals(c2 Currencies) bool {
+	for _, v := range c {
+		found := false
+		for _, v2 := range c2 {
+			if v == v2 {
+				found = true
+				break
+			} else if v == nil || v2 == nil {
+				found = false
+				break
+			} else if v.Equals(v2) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+
+	return true
+}
 
 // Find finds a Currency within the Currencies slice from the given
 // currency code, or returns an error if the currency code was not found
@@ -42,4 +79,27 @@ func (c Currencies) Find(code string) (*Currency, error) {
 // otherwise
 func (c Currency) Is(code string) bool {
 	return c.Code == strings.ToUpper(code)
+}
+
+// DecimalPlaces returns the number of decimal places a currency has
+// e.g. for USD there are 2 ($12.25), for JPY there are 0 (5412)
+func (c Currency) DecimalPlaces() int {
+	// Here we just test for the currencies that don't have 2 decimal places
+
+	switch c.Code {
+
+	case "BIF", "BYR", "CLP", "DJF", "GNF", "ISK", "JPY", "KMF", "KRW",
+		"XPF", "XOF", "XAF", "VUV", "VND", "UYI", "UGX", "RWF", "PYG":
+		return 0
+
+	case "BHD", "IQD", "JOD", "KWD", "LYD", "TND", "OMR":
+		return 3
+
+	case "CLF":
+		return 4
+
+	default:
+		return 2
+
+	}
 }
