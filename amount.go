@@ -165,7 +165,7 @@ func (a Amount) Div(b *Amount) (*Amount, error) {
 //  - < 0 if a is smaller than b
 //  - > 0 if a is greater than b
 // The comparison is done using both amount's base currencies
-func (a *Amount) Cmp(b *Amount) (int, error) {
+func (a Amount) Cmp(b Amount) (int, error) {
 	if a.Trader.BaseCurrency.Code != b.Trader.BaseCurrency.Code {
 		return 0, fmt.Errorf("The base currency of a and b differ: %s & %s",
 			a.Trader.BaseCurrency.Code, b.Trader.BaseCurrency.Code)
@@ -184,7 +184,7 @@ func (a *Amount) Round(places int32) {
 // Int64 translates an amount into an integer (of type int64),
 // basically adjusts the amount to the lowest possible decimal of
 // the currency (USD: 10.23 -> 1023)
-func (a *Amount) Int64() (int64, error) {
+func (a Amount) Int64() (int64, error) {
 	mulF := math.Pow10(a.Currency.DecimalPlaces())
 
 	factor, err := a.Trader.NewAmountFromFloat(mulF, a.Currency.Code)
@@ -208,7 +208,7 @@ func (a *Amount) Int64() (int64, error) {
 }
 
 // Uint64 does the same thing as Int64, but for unsigned
-func (a *Amount) Uint64() (uint64, error) {
+func (a Amount) Uint64() (uint64, error) {
 	mulF := math.Pow10(a.Currency.DecimalPlaces())
 
 	factor, err := a.Trader.NewAmountFromFloat(mulF, a.Currency.Code)
