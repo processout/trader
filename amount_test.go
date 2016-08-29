@@ -538,3 +538,14 @@ func TestUint64(t *testing.T) {
 		t.Error("Wrong conversion")
 	}
 }
+
+func TestRound(t *testing.T) {
+
+	trader := getTrader()
+	amount, _ := trader.NewAmountFromString("2.3", "usd")
+
+	amount.Round(0)
+	if amount.Value.Cmp(decimal.New(2, 0)) != 0 {
+		t.Error("Should be equal")
+	}
+}
